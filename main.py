@@ -31,30 +31,27 @@ def calculate_data():
 
     u = np.zeros((K + 1, I + 1))
 
-    def phi(x):
-        return np.sin(np.pi * x / l) ** 2
+    t = np.linspace(0, T, K + 1)
+    z = np.linspace(0, l, I + 1)
+
+    phi = np.sin(np.pi * z / l) ** 2
 
     def difference_scheme():
-        # 2
-        u[0][:] = u_0
 
         for k in range(0, K):
-            # 3
-            u[k + 1][0] = (ht/c) * (-2*alpha*u[k][0]/R + phi(0) + 2*k_k*(u[k][1]-u[k][0])/(hx**2)) + u[k][0]
-
-        for k in range(0, K):
-            for i in range(1, I):
-                # 1
-                u[k + 1][i] = (k_k * (u[k][i + 1] - 2 * u[k][i] + u[k][i - 1])/(hx**2) - u[k][i] * 2 * alpha / R + phi(hx * i)) * ht / c + u[k][i]
-
-        for k in range(0, K):
-            # 4
-            u[k + 1][I] = (ht/c) * ((k_k/(hx**2))*((-2*((hx*alpha)/k_k + 1))*u[k][I] + 2*u[k][I - 1]) - 2*alpha*u[k][I]/R + phi(hx * I)) + u[k][I]
+            u[k + 1, 0] = u[k, 0] * (
+                        1 - 2 * k_k * ht / c / hx / hx - 2 * alpha * ht / c / R) + 2 * k_k * ht / c / hx / hx * u[
+                              k, 1] + ht / c * phi[0]
+            u[k + 1, 1:I] = u[k, 1:I] * (
+                        1 - 2 * k_k * ht / c / hx / hx - 2 * alpha * ht / c / R) + k_k * ht / c / hx / hx * (
+                                        u[k, 0:I - 1] + u[k, 2:I + 1]) + ht / c * phi[1:I]
+            u[k + 1, I] = u[k, I] * (
+                        1 - 2 * k_k * ht / c / hx / hx - 2 * alpha * ht / c / R - 2 * alpha * ht / c / hx) + 2 * k_k * ht / c / hx / hx * \
+                          u[k, I - 1] + ht / c * phi[I]
 
     difference_scheme()
 
-    t = np.linspace(0, T, K+1)
-    z = np.linspace(0, l, I+1)
+
 
     figure = Figure(figsize=(5, 4), dpi=100)
     pl = figure.add_subplot(1, 1, 1)
