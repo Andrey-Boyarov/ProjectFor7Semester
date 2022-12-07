@@ -39,6 +39,7 @@ def calculate_data():
     def difference_scheme():
 
         for k in range(0, K):
+            u[0, 1:I] = u_0
             u[k + 1, 0] = u[k, 0] * (
                         1 - 2 * k_k * ht / c / hx / hx - 2 * alpha * ht / c / R) + 2 * k_k * ht / c / hx / hx * u[
                               k, 1] + ht / c * phi[0]
